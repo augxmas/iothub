@@ -305,7 +305,7 @@ public class IoTListener extends HttpServlet {
 				if(_month < 10) {
 					month = "0"+_month;
 				}
-				args = new String[] {id,id,year+month+"%",id,year+month+"%"};
+				args = new String[] {id,year+month+"%", id,id,year+month+"%"};
 				
 				try {
 					doc = remote.executeQuery(dataSource, QUERY_FILE, r_status, dummy, args);

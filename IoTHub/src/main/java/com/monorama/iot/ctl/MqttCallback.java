@@ -11,6 +11,9 @@ import org.jepetto.proxy.HomeProxy;
 public class MqttCallback implements org.eclipse.paho.client.mqttv3.MqttCallback {
 
 	DisneyLogger cat = new DisneyLogger(MqttCallback.class.getName());
+	
+	
+	
 	int count;
 	int size = 5;
 	//int size = 5;
@@ -59,6 +62,7 @@ public class MqttCallback implements org.eclipse.paho.client.mqttv3.MqttCallback
 			m.start();
 		} catch (java.lang.NullPointerException e) {
 			e.printStackTrace();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

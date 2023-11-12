@@ -54,6 +54,11 @@ function isFired(){
 			var hr = now.getHours();
 			var min = now.getMinutes();
 			var sec = now.getSeconds();
+			
+			if(hr == 0){
+				hr = "00";
+			}
+			
 			if(dd < 10){
 				dd = "0" + dd;
 			}
@@ -66,9 +71,9 @@ function isFired(){
 				sec = "0" + sec;
 			}
 			
-			var _now = Number(yyyy.toString()+mm.toString()+dd.toString()+hr.toString()+min.toString()+sec.toString());
+			var _now = parseInt(yyyy.toString()+mm.toString()+dd.toString()+hr.toString()+min.toString()+sec.toString());
 			
-			$("#date").append("확인시간:" + mm + "월" + dd + "일" + hr + "시" + min+ "분" + sec+"초");
+			$("#date").append("확인시간 : " + mm + "월 " + dd + "일 " + hr + "시 " + min+ "분 " + sec+"초");
 
 			for(i in arr){
 				innerHtml += "<tr width='800px'>";
@@ -82,10 +87,13 @@ function isFired(){
 				innerHtml += "</h4>";
 				innerHtml += "<p class='text-muted m-b-25 font-13'>";
 				
-				console.log("time : " + _now );//- 
-				console.log("getDate " +  arr[i]._regdate);
+				console.log("idx : " + i );//-
+				console.log("now : " + _now );//- 
+				console.log("now : "  +  arr[i]._regdate.toString());
 				//console.log("gab " + (_now -arr[i]._regdate ));
-				gab = _now -arr[i]._regdate;
+				gab = parseInt(_now) - parseInt(arr[i]._regdate.toString());
+				console.log("gab " +  gab);
+				//console.log("gab " +  (20231024172719 - 19000101235959 ));
 				
 				if(gab < 10 & ( arr[i].isFired00 == "1" || arr[i].isFired01 == "1" )){
 					$("#flag").removeClass("btn btn-primary");

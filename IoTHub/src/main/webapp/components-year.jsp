@@ -22,7 +22,7 @@ $(document).ready(function(){
 function showStatus(){
 	
 	$.ajax({
-		url:"/IoTHub/listener",
+		url:"/iothub/listener",
 		type:"post",
 		async : true,
 	    headers : {              // Http header
@@ -44,6 +44,11 @@ function showStatus(){
 				var dd = now.getDate();
 				var hr = now.getHours();
 				var min = now.getMinutes();
+				
+				if(hr == 0){
+					hr = "00";
+				}
+				
 				if(min < 10){
 					min = "0" + min;
 				}
@@ -51,7 +56,7 @@ function showStatus(){
 				if(sec < 10){
 					sec = "0" + sec;
 				}
-				$("#date").append("확인시간:" + mm + "월" + dd + "일" + hr + "시" + min+ "분" + sec+"초 " );
+				$("#date").append("확인시간 : " + mm + "월 " + dd + "일 " + hr + "시 " + min+ "분 " + sec+"초" );
 				var i = 0;
 				try{
 					for (i = 0 ; i < arr.length/3 ; i++) {

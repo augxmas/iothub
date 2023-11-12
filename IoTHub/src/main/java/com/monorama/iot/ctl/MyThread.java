@@ -1,17 +1,15 @@
 package com.monorama.iot.ctl;
 
-import java.net.InetAddress;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.jepetto.bean.Facade;
 import org.jepetto.proxy.HomeProxy;
 import org.jepetto.util.PropertyReader;
@@ -28,14 +26,14 @@ public class MyThread extends Thread {
 	private static final String hexdata = "0x";
 
 	private HomeProxy proxy = null;
-	private MqttClient client = null;
+	//private MqttClient client = null;
 
 	private String raw;
 	private String serialNum;
 
 	public MyThread(MqttClient client, HomeProxy proxy, String raw, String serialNum) {
 		// TODO Auto-generated constructor stub
-		this.client = client;
+		//this.client = client;
 		this.proxy = proxy;
 		this.raw = raw;
 		this.serialNum = serialNum;
@@ -45,12 +43,9 @@ public class MyThread extends Thread {
 	public void run() {
 
 		int updatedCnt = -1;
-		HashMap<String, String> dummy = new HashMap<String, String>();
+		//Map<String, String> dummy = new HashMap<String, String>();
 		
 		try {
-			// int count = 0;
-			// int index = 0;
-			//String unixTime = null;
 
 			Facade remote = proxy.getFacade();
 			//String unixDate = null;
@@ -64,15 +59,13 @@ public class MyThread extends Thread {
 			// int idx = 0;
 
 			//raw = this.args;
-			String _unixDate = raw.substring(0, 8); // unixTime (8)
-			String unixDate = getTimestampToDate(_unixDate);
-			String unixTime = getTimestampToTime(_unixDate);
-			isFired1st = raw.substring(8, 9);
-			isFired2nd = raw.substring(9, 10);
-			System.out.println(unixDate+unixTime + "/" + serialNum + "/" + isFired1st + "/" + isFired2nd);
-			// logger.debug(unixDate+"/"+serialNum+"/"+isFired1st+"/"+isFired2nd);
+			String _unixDate	= raw.substring(0, 8); // unixTime (8)
+			String unixDate		= getTimestampToDate(_unixDate);
+			String unixTime		= getTimestampToTime(_unixDate);
+			isFired1st			= raw.substring(8, 9);
+			isFired2nd			= raw.substring(9, 10);
 
-			HashMap<String, String> map = new HashMap<String, String>();
+			Map<String, String> map = new HashMap<String, String>();
 			if (isFired1st.equals("1") ) { //|| isFired2nd.equals("1")) {
 				args = new String[] { serialNum, unixDate+unixTime, isFired1st, isFired2nd, };
 				updatedCnt = remote.executeUpdate(dataSource, QUERY_FILE, IoTListener.c_sensor, map, args);
@@ -84,14 +77,7 @@ public class MyThread extends Thread {
 			if (isFired1st.equals("1") && isFired2nd.equals("1")) {
 				args = new String[] { serialNum, unixDate, isFired1st, isFired2nd, };
 				updatedCnt = remote.executeUpdate(dataSource, QUERY_FILE, IoTListener.c_sensor, map, args);
-				/*
-				String topic = IoTListener.topic4pub + serialNum;
-				MqttMessage msg = new MqttMessage();
-				String unixTime = String.valueOf(Long.toHexString(Instant.now().getEpochSecond()));
-				System.out.println(topic+unixTime+cmd+"FF");
-				msg.setPayload((unixTime+cmd+"FF").getBytes());
-				client.publish(topic, msg);	
-				//*/
+
 			}
 
 		} catch (java.lang.StringIndexOutOfBoundsException e) {
@@ -112,7 +98,6 @@ public class MyThread extends Thread {
 	private static String getTimestampToDate(String unixTime) {
 		String hex1 = hexdata + unixTime;
 		int covertedValue = Integer.decode(hex1);
-		long timestamp = Long.parseLong(String.valueOf(covertedValue));
 		Date date = new java.util.Date(covertedValue * 1000L);
 		SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd");
 		sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT+9"));
@@ -123,7 +108,6 @@ public class MyThread extends Thread {
 	private static String getTimestampToTime(String unixTime) {
 		String hex1 = hexdata + unixTime;
 		int covertedValue = Integer.decode(hex1);
-		long timestamp = Long.parseLong(String.valueOf(covertedValue));
 		Date date = new java.util.Date(covertedValue * 1000L);
 		SimpleDateFormat sdf = new java.text.SimpleDateFormat("HHmmss");
 		sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT+9"));
@@ -136,37 +120,6 @@ public class MyThread extends Thread {
 		int covertedValue = Integer.decode(hex);
 		String data = String.valueOf(covertedValue);
 		return data;
-	}
-
-	private static String getIpaddress(String ip) {
-		String ipAddress = "";
-		for (int i = 0; i < ip.length(); i = i + 2) {
-			ipAddress = ipAddress + Integer.valueOf(ip.substring(i, i + 2), 16) + ".";
-		}
-		ipAddress = ipAddress.substring(0, ipAddress.length() - 1);
-		return ipAddress;
-	}
-
-	private static String getTemp(String str) {
-		String data = "";
-		String hex = hexdata + str;
-		double covertedValue = Integer.decode(hex);
-		DecimalFormat form = new DecimalFormat("#.#");
-		if (covertedValue > 32768) {
-			double validatordata = (covertedValue - 65536) / 10;
-			String Temp = String.format("%.1f", validatordata);
-		} else {
-			data = String.format("%.1f", (covertedValue / 10));
-		}
-		return data;
-	}
-
-	private static String getHumid(String str) {
-		String hex = hexdata + str;
-		float covertedValue = Integer.decode(hex);
-		String data = String.format("%.1f", (covertedValue / 10));
-		return data;
-
 	}
 
 }
