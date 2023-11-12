@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<Resource 
+		name="iot/mysql"
+		auth="Container"
+		type="javax.sql.DataSource"
+		driverClassName="com.mysql.cj.jdbc.Driver"
+		url="jdbc:mysql://mysql.monorama.kr:3306/iot?characterEncoding=UTF-8&amp;serverTimezone=UTC&amp;autoReconnect=true "
+		username="user01"
+		password="user01"
+		maxWaitMillis="20"
+		maxIdle="10"
+		maxWait="-1"
+	/>
+ </Context> 
