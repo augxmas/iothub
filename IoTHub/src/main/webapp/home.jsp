@@ -2,6 +2,7 @@
 <%@ page import="com.monorama.iot.ctl.IoTListener" %>
 <%@ page import="org.json.simple.JSONArray" %>
 <%@ page import="org.json.simple.JSONObject" %>
+<%@ page import="java.util.List" %>
 
 <!DOCTYPE html>
 <%
@@ -20,11 +21,13 @@ String serialNum = (String)session.getAttribute(IoTListener.serialNumField);
 
 $(document).ready(function(){
 	isFired();
-	setInterval(isFired,3000);
+	setInterval(isFired,1000);
 });
 
+
+
 function isFired(){
-	
+	var idx = 0;
 	$.ajax({
 		url:"/iothub/listener",
 		type:"post",
@@ -37,6 +40,7 @@ function isFired(){
 	    data : JSON.stringify({  
 	        'mode' :'<%=IoTListener.stateMode%>',
 	        'serialNum':'<%=serialNum%>'	    	
+	        
 	    }),		
 		success:function(result){
 			var innerHtml = "";
@@ -53,7 +57,12 @@ function isFired(){
 			var dd = now.getDate();
 			var hr = now.getHours();
 			var min = now.getMinutes();
-			var sec = now.getSeconds();
+			//var sec = now.getSeconds();
+			
+			if(mm < 10){	
+				console.log("month " + mm);
+				mm = "0" + mm;
+			}
 			
 			if(hr == 0){
 				hr = "00";
@@ -66,14 +75,17 @@ function isFired(){
 			if(min < 10){
 				min = "0" + min;
 			}
+			/*
 			var sec = now.getSeconds();
 			if(sec < 10){
 				sec = "0" + sec;
-			}
+			}*/
 			
-			var _now = parseInt(yyyy.toString()+mm.toString()+dd.toString()+hr.toString()+min.toString()+sec.toString());
+			//var _now = parseInt(yyyy.toString()+mm.toString()+dd.toString()+hr.toString()+min.toString()+sec.toString());
 			
-			$("#date").append("확인시간 : " + mm + "월 " + dd + "일 " + hr + "시 " + min+ "분 " + sec+"초");
+			var _now = parseInt(yyyy.toString()+mm.toString()+dd.toString()+hr.toString()+ min.toString());
+			
+			$("#date").append("확인시간 : " + mm + "월 " + dd + "일 " + hr + "시 " + min+ "분 " );//sec+"초");
 
 			for(i in arr){
 				innerHtml += "<tr width='800px'>";
@@ -88,14 +100,18 @@ function isFired(){
 				innerHtml += "<p class='text-muted m-b-25 font-13'>";
 				
 				console.log("idx : " + i );//-
-				console.log("now : " + _now );//- 
-				console.log("now : "  +  arr[i]._regdate.toString());
-				//console.log("gab " + (_now -arr[i]._regdate ));
+				//console.log("now : " + _now );//- 
+				//console.log("now : "  +  arr[i]._regdate.toString());
+				console.log("regdate " + arr[i]._regdate);
+				console.log("now  " + _now);
 				gab = parseInt(_now) - parseInt(arr[i]._regdate.toString());
 				console.log("gab " +  gab);
 				//console.log("gab " +  (20231024172719 - 19000101235959 ));
+				console.log(_now);
+				console.log("00 " + arr[i].isFired00 + (arr[i].isFired00 == "1"));
+				console.log("01 " + arr[i].isFired01 + (arr[i].isFired01 == "1"));
 				
-				if(gab < 10 & ( arr[i].isFired00 == "1" || arr[i].isFired01 == "1" )){
+				if((gab < 1)&& ( arr[i].isFired00 == "1" || arr[i].isFired01 == "1" )){
 					$("#flag").removeClass("btn btn-primary");
 					$("#flag").addClass("btn btn-danger");
 					innerHtml += arr[i].regdate + "에 화재등록";
@@ -113,16 +129,16 @@ function isFired(){
 						innerHtml += "<input type='checkbox' id='isFired00' />주벨 ";
 					}
 					if(arr[i].isFired01 == "1"){
-						innerHtml += "<input type='checkbox' id='isFired01' checked />화재이보 ";
+						///innerHtml += "<input type='checkbox' id='isFired01' checked />화재이보 ";
 					}else{
-						innerHtml += "<input type='checkbox' id='isFired01' />화재이보 ";
+						//innerHtml += "<input type='checkbox' id='isFired01' />화재이보 ";
 					}
 				}else{
 					innerHtml += "<input type='checkbox' id='isFired00'  />주벨 ";
-					innerHtml += "<input type='checkbox' id='isFired01'  />화재이보 ";
+					//innerHtml += "<input type='checkbox' id='isFired01'  />화재이보 ";
 				}
 					
-				innerHtml += "<button class='btn' id='flag' >제어하기</button>";			
+				innerHtml += "<button class='btn' id='flag' ><a href='./pages-fire.jsp?serialNum="+arr[i].serialNum+"'>제어하기</a></button>";			
 				
 				innerHtml += "</p>";
 				innerHtml += "</div>";

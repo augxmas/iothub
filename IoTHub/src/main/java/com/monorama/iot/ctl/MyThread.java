@@ -64,9 +64,10 @@ public class MyThread extends Thread {
 			String unixTime		= getTimestampToTime(_unixDate);
 			isFired1st			= raw.substring(8, 9);
 			isFired2nd			= raw.substring(9, 10);
-
+			System.out.println("isFired1st " + isFired1st);
+			System.out.println("isFired2nd " + isFired2nd);
 			Map<String, String> map = new HashMap<String, String>();
-			if (isFired1st.equals("1") ) { //|| isFired2nd.equals("1")) {
+			if (isFired1st.equals("1") || isFired2nd.equals("1")) {
 				args = new String[] { serialNum, unixDate+unixTime, isFired1st, isFired2nd, };
 				updatedCnt = remote.executeUpdate(dataSource, QUERY_FILE, IoTListener.c_sensor, map, args);
 				if (updatedCnt > 0) {

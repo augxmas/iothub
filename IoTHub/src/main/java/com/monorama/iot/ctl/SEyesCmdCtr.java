@@ -125,7 +125,7 @@ public class SEyesCmdCtr extends HttpServlet {
 		try {
 			//client.subscribe("Fire/ack/#", 1);
 			MqttMessage msg = new MqttMessage();
-			topic = getTopic("");
+			topic = getTopic(serialNum);
 			client.publish(topic, msg);
 			
 		} catch (MqttException e) {
@@ -136,8 +136,8 @@ public class SEyesCmdCtr extends HttpServlet {
 		
 	}
 	
-	private String getTopic(String str) {
-		String topic = "Fire/ack/#";
+	private String getTopic(String serialNum) {
+		String topic = "Fire/ack/#" + serialNum;
 		return topic;
 	}
 

@@ -10,7 +10,7 @@ String userName = (String) session.getAttribute(IoTListener.nameField);
 if (userName == null) {
 	response.sendRedirect("pages-login.jsp");
 }
-String serialNum = (String) request.getParameter(IoTListener.serialNumField);
+String serialNum = (String) request.getAttribute(IoTListener.serialNumField);
 %>
 <!DOCTYPE html>
 <html>

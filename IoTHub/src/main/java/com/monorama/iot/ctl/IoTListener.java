@@ -7,9 +7,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.naming.NamingException;
@@ -44,10 +46,23 @@ public class IoTListener extends HttpServlet {
 
 	static PropertyReader reader = PropertyReader.getInstance();
 
+	/**
+	 * mqtt_ip : mosquitto  서버 주소 mqtt.seyes.kr 
+	 */
 	public static final String MQTT_BROKER_IP	= reader.getProperty("mqtt_ip"); // "tcp://iot.seyes.kr:80";
+	/**
+	 * rdbms : MySQL 을 적용 중
+	 * meta-inf/context.xml 에 접속 정보는 정의되어 있음. jndi 사용 중
+	 */
 	public static final String dataSource		= reader.getProperty("iot_mysql_datasource");
+	/**
+	 * CATALINA_HOME/conf/iot_query.xml.
+	 */
 	public static final String QUERY_FILE		= reader.getProperty("iot_query_file");
 
+	/**
+	 * request 의 구분자
+	 */
 	public static final String mode 	= "mode";
 	public static final String on		= "on";
 	public static final String off		= "off";
@@ -58,16 +73,46 @@ public class IoTListener extends HttpServlet {
 	public static final String topic4sub	= "Fire/ack/#";
 	public static final String topic4pub	= "Fire/req/";
 
+	/**
+	 * mode=1 인 경우, 로그인
+	 */
 	public static final String loginMode	= "1";	// 로그인
+	/**
+	 * mode=2 인 경우, 화재기를 제어하는 상태님
+	 */
 	public static final String cmdMode		= "2";	// 화재기 제어
+	/**
+	 * mode=3 인 경우, 건물화재 상태를 질의
+	 */
 	public static final String stateMode	= "3";	// 관리건물의 화재 상태
+	/**
+	 * mode=4 인 경우, 화재발생 현황, 통계
+	 */
+	public static final String statusMode	= "4";	// 화재 발생 및 제언 현황
+	/**
+	 * mode=5 인 경우, 로그아웃
+	 */
 	public static final String logoutMode	= "5";	// 로그아웃
-	public static final String statusMode	= "4";	// 화재 발생 및 제언 통계
-
+	
+	/**
+	 * 로그인
+	 */
 	public static final String r_member	= "r_member";
+	/**
+	 * 화재 제어 
+	 */
 	public static final String u_sensor = "u_sensor";
+	/**
+	 * 화재 발생 접수
+	 */
 	public static final String c_sensor = "c_sensor";
+	/**
+	 * 관리자의 장비 상태
+	 */
 	public static final String r_state	= "r_state";
+	/**
+	 * 관리자의 건물에 발생된 화재 상황(통계)
+	 */
 	public static final String r_status	= "r_status";
 
 	public static final String regdateField		= "regdate";
@@ -150,7 +195,7 @@ public class IoTListener extends HttpServlet {
 				String cmd08 = (String) req.getAttribute(CMD08);	//펌프#5 끄기
 				String serialNum = (String) req.getAttribute(IoTListener.serialNumField);
 				String cmd = cmd01 + cmd02 + cmd03 + cmd04 + cmd05 + cmd06 + cmd07 + cmd08;
-
+				//System.out.println("cmd ? " + cmd);
 				try {
 					args = new String[] { cmd01, cmd02, cmd03, cmd04, cmd05, cmd06, cmd07, cmd08, serialNum };
 					remote.executeUpdate(dataSource, QUERY_FILE, u_sensor, dummy, args);
@@ -212,7 +257,10 @@ public class IoTListener extends HttpServlet {
 					stmt = con.prepareStatement(xpath);
 					rset = stmt.executeQuery();
 					HttpSession session = req.getSession(true);
+					boolean isFound = false;
+					List <String>list = new ArrayList<String>();
 					if (rset.next()) {
+						isFound = true;
 						_id = rset.getString(idField);
 						_password = rset.getString(passwordField);
 						name = rset.getString(nameField);
@@ -222,12 +270,18 @@ public class IoTListener extends HttpServlet {
 						session.setAttribute(idField,_id);
 						session.setAttribute(nameField, name);
 						session.setAttribute(serialNumField, serialNum);
-						session.setAttribute(aptNameField, aptName);
+						list.add(serialNum);
+						//session.setAttribute(aptNameField, aptName);
 
+					} 
+					
+					if(isFound) {
+						//session.setAttribute(serialNumField, list);
 						if (id.equals(_id) && password.equals(_password)) {
 							res.sendRedirect("/iothub/home.jsp");
 						}
-					} else {
+					}
+					else {
 						msg.put(CODE, VALUE4NOTFOUND);
 						msg.put(MESSAGE, "입력정보를 확인해주세요");
 						res.sendRedirect("/iothub/pages-login.jsp?code=400");
@@ -360,6 +414,7 @@ public class IoTListener extends HttpServlet {
 			} // end of logout
 
 		} catch (java.lang.NullPointerException e) {
+			e.printStackTrace();
 			System.out.println("Started............Listener");
 		}
 
@@ -369,7 +424,10 @@ public class IoTListener extends HttpServlet {
 		String topic = topic4pub + serialNum;
 		MqttMessage msg = new MqttMessage();
 		String unixTime = String.valueOf(Long.toHexString(Instant.now().getEpochSecond()));
+		System.out.println("unixTime : " + unixTime);
+		System.out.println("topic : " + topic);
 		System.out.println(topic + unixTime + cmd + "FF");
+		System.out.println(unixTime + cmd + CRC);
 		msg.setPayload((unixTime + cmd + CRC).getBytes());
 		client.publish(topic, msg);
 	}
