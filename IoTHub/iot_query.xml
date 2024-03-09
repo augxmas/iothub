@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmlquery>
+
+<sql key='r_member'  desc='회원로그인'>
+   <![CDATA[
+SELECT 
+	m.id, 
+    m.password,
+    m.name,
+    c.serialNum,
+	c.name as aptName
+FROM 
+member as m, 
+company as c
+where 1=1 
+and m.companyId = c.id
+and m.id = ?
+and m.password = ?
+   ]]>
+</sql>
+
+<sql key='c_sensor'  desc='화재 신고 접수'>
+	<![CDATA[
+		INSERT INTO `iot`.`score`
+		(
+			`serialNum`,
+			`regdate`,
+			`isFired00`,
+			`isFired01`,
+			`flag`
+		)
+		VALUES
+		(
+			?,
+			?,
+			?,
+			?,
+			'false'
+		)
+	]]>
+</sql>
+<sql key='u_sensor'  desc='소방제어 명령 접수'>
+	<![CDATA[
+		UPDATE `iot`.`score`
+		SET
+			cmd01 = ?,
+			cmd02 = ?,
+			cmd03 = ?,
+			cmd04 = ?,
+			cmd05 = ?,
+			cmd06 = ?,
+			cmd07 = ?,
+			cmd08 = ?,
+			flag = 'true',
+			updateddate = now()
+		WHERE 1=1 
+		and `serialNum` = ?
+		and flag = 'false'
+	]]>
+</sql>
+
+<sql key='r_sensor'  desc='센서 수집 데이타 조회'>
+   <![CDATA[
+   		select
+			serialNum,
+			refId,
+			regdate,
+			isFired
+		from
+		score
+		where 1=1
+		and serialNum = ?
+		and regdate between ? and ? 
+   ]]>
+</sql>
+
+<sql key='r_state_old'  desc='센서 상태'>
+   <![CDATA[
+		SELECT 
+			s.regdate,
+			1 as cnt
+		FROM 
+		score AS s
+		where 1=1
+		and s.serialNum = ?
+		and isFired00 = '1'
+		and flag = 'false'
+   ]]>
+</sql>
+
+<sql key='r_state'  desc='센서 상태'>
+   <![CDATA[
+				select
+						distinct 
+                        c.name as aptName,
+                        c.serialNum ,
+                        ifnull(s.isFired00,0) as isFired00,
+                        ifnull(s.isFired01,0) as isFired01 ,
+						date_format(ifnull(s.regdate,19000101235959), '%Y%m%d%H%i%s') as _regdate,
+                        date_format(ifnull(s.regdate,19000101235959), '%Y-%m-%d %H:%i:%s') as regdate
+                from
+                company as c
+                inner join member as m on c.id = m.companyId
+                left join scoreview as s on s.serialNum = c.serialNum
+                where 1=1
+                and m.id = ?
+                
+   ]]>
+</sql>
+
+<sql key='r_status_old'  desc='화재 발생 및 제어 현황'>
+   <![CDATA[
+select 
+	1 as idx,
+	c.name as aptName,
+    s.serialNum,
+	count(*) as cnt 
+from 
+company as c
+inner join member as m on c.id = m.companyId
+left join score as s on s.serialNum = c.serialNum
+where 1=1
+and m.id = ?
+group by c.name, s.serialNum
+union all
+select 
+	2 as idx,
+	c.name as aptName,
+    s.serialNum,
+	count(*) as cnt
+from 
+company as c
+inner join member as m on c.id = m.companyId
+left join score as s on s.serialNum = c.serialNum
+where 1=1
+and m.id = ?
+and s.regdate like ?
+group by c.name, s.serialNum
+union all
+select 
+	3 as idx,
+	c.name as aptName,
+    s.serialNum,
+	count(*) as cnt
+from 
+company as c
+inner join member as m on c.id = m.companyId
+left join score as s on s.serialNum = c.serialNum
+where 1=1
+and m.id = ?
+and s.regdate like ?
+and s.flag = 'true'
+group by c.name, s.serialNum
+order by aptName, idx
+ ]]>
+</sql>
+
+<sql key='r_status'  desc='화재 발생 및 제어 현황'>
+   <![CDATA[
+select 
+	1 as idx,
+	c.name as aptName,
+    s.serialNum,
+	count(*) as cnt 
+from 
+company as c
+inner join member as m on c.id = m.companyId
+left join score as s on s.serialNum = c.serialNum
+where 1=1
+and m.id = ?
+group by c.name, s.serialNum      
+union all
+select 
+	2 as idx,
+	c.name as aptName,
+    s.serialNum,
+	count(*) as cnt
+from 
+company as c
+inner join member as m on c.id = m.companyId
+left join score as s on s.serialNum = c.serialNum and s.regdate like ?
+where 1=1
+and m.id = ?
+group by c.name, s.serialNum   
+union all
+select 
+	3 as idx,
+	c.name as aptName,
+    s.serialNum,
+	count(*) as cnt
+from 
+company as c
+inner join member as m on c.id = m.companyId and m.id = ?
+left join score as s on c.serialNum = s.serialNum and s.regdate like ? and flag='true'
+where 1=1
+group by c.name, s.serialNum
+ ]]>
+</sql>
+
+</xmlquery>
