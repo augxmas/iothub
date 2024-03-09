@@ -24,8 +24,6 @@ $(document).ready(function(){
 	setInterval(isFired,3000);
 });
 
-
-
 function isFired(){
 	var idx = 0;
 	$.ajax({
@@ -58,7 +56,6 @@ function isFired(){
 			var min = now.getMinutes();
 			
 			if(mm < 10){	
-				//console.log("month " + mm);
 				mm = "0" + mm;
 			}
 			
