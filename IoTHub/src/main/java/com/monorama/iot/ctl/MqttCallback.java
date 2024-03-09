@@ -57,7 +57,7 @@ public class MqttCallback implements org.eclipse.paho.client.mqttv3.MqttCallback
 		try {
 			message = msg.toString();
 			//cat.debug(raw + "/" + topic );
-			System.out.println("topic " + topic + " serialNum " + serialNum + " message " + message );
+			
 			cat.debug("topic: " + topic + " serialNum: " + serialNum + " message " + message );
 			MyThread m = new MyThread(client,proxy,message,serialNum);
 			m.start();

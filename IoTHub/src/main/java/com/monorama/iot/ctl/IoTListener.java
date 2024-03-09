@@ -115,22 +115,22 @@ public class IoTListener extends HttpServlet {
 	 */
 	public static final String r_status	= "r_status";
 
-	public static final String regdateField		= "regdate";
-	public static final String _regdateField		= "_regdate";
-	public static final String aptNameField		= "aptName";
-	public static final String passwordField	= "password";
-	public static final String idField 			= "id";
-	public static final String nameField		= "name";
-	public static final String serialNumField	= "serialNum";
-	public static final String idxField			= "idx";
-	public static final String cntField			= "cnt";
+	public static final String regdateField							= "regdate";
+	public static final String _regdateField						= "_regdate";
+	public static final String aptNameField						= "aptName";
+	public static final String passwordField						= "password";
+	public static final String idField 										= "id";
+	public static final String nameField								= "name";
+	public static final String serialNumField						= "serialNum";
+	public static final String idxField									= "idx";
+	public static final String cntField									= "cnt";
 
-	public static final String CODE					= "code";
-	public static final String ISFIRED00			= "isFired00";
-	public static final String ISFIRED01			= "isFired01";
-	public static final String MESSAGE				= "message";
-	public static final String VALUE4NORMAL			= "200";
-	public static final String VALUE4NOTFOUND		= "400";
+	public static final String CODE											= "code";
+	public static final String ISFIRED00								= "isFired00";
+	public static final String ISFIRED01								= "isFired01";
+	public static final String MESSAGE								= "message";
+	public static final String VALUE4NORMAL					= "200";
+	public static final String VALUE4NOTFOUND				= "400";
 	public static final String VALUE4INTERNALERROR	= "500";
 	
 	

@@ -16,14 +16,12 @@ import org.jepetto.util.PropertyReader;
 
 public class MyThread extends Thread {
 
-
-
 	static PropertyReader reader = PropertyReader.getInstance();
 	private Logger logger = LogManager.getLogger(MyThread.class);
-	//final String MQTT_BROKER_IP = reader.getProperty("mqtt_ip"); // "tcp://iot.seyes.kr:80";
-	private static final String dataSource = reader.getProperty("iot_mysql_datasource");
-	private static final String QUERY_FILE = reader.getProperty("iot_query_file");
-	private static final String hexdata = "0x";
+
+	private static final String dataSource 		= reader.getProperty("iot_mysql_datasource");
+	private static final String QUERY_FILE 	= reader.getProperty("iot_query_file");
+	private static final String hexdata 				= "0x";
 
 	private HomeProxy proxy = null;
 	//private MqttClient client = null;
@@ -32,8 +30,6 @@ public class MyThread extends Thread {
 	private String serialNum;
 
 	public MyThread(MqttClient client, HomeProxy proxy, String raw, String serialNum) {
-		// TODO Auto-generated constructor stub
-		//this.client = client;
 		this.proxy = proxy;
 		this.raw = raw;
 		this.serialNum = serialNum;
@@ -59,20 +55,20 @@ public class MyThread extends Thread {
 			// int idx = 0;
 
 			//raw = this.args;
-			String _unixDate	= raw.substring(0, 8); // unixTime (8)
+			String _unixDate		= raw.substring(0, 8); // unixTime (8)
 			String unixDate		= getTimestampToDate(_unixDate);
 			String unixTime		= getTimestampToTime(_unixDate);
-			isFired1st			= raw.substring(8, 9);
-			isFired2nd			= raw.substring(9, 10);
-			System.out.println("isFired1st " + isFired1st);
-			System.out.println("isFired2nd " + isFired2nd);
+			isFired1st					= raw.substring(8, 9);
+			isFired2nd					= raw.substring(9, 10);
+			
 			Map<String, String> map = new HashMap<String, String>();
 			if (isFired1st.equals("1") || isFired2nd.equals("1")) {
 				args = new String[] { serialNum, unixDate+unixTime, isFired1st, isFired2nd, };
 				updatedCnt = remote.executeUpdate(dataSource, QUERY_FILE, IoTListener.c_sensor, map, args);
+				/*
 				if (updatedCnt > 0) {
 					System.out.println(updatedCnt + " updated...");
-				}
+				}//*/
 			}
 
 			if (isFired1st.equals("1") && isFired2nd.equals("1")) {
